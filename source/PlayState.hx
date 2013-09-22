@@ -20,9 +20,11 @@ class PlayState extends FlxState
 {
 	private var _timer:Float;
 	private var _spawnTime:Float;
-	//private var _players:FlxTypedGroup<Player>;
+	private var _playerSpawnTimer:Float;
 	private var _enemies:FlxTypedGroup<Enemy>;
 	private var _hud:FlxGroup;
+	private var _players:FlxTypedGroup<Player>;
+	private var _score:FlxText;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -36,13 +38,20 @@ class PlayState extends FlxState
 		_enemies.maxSize = 25;
 		#end
 		_hud = new FlxGroup();
+		_players = new FlxTypedGroup<Player>();
+		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, "Z"));
+		
+		_score = new FlxText(0, FlxG.height/2, Math.floor(FlxG.width),"0");
+		_score.setFormat(null, 48, 0x383D2A, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
+		_hud.add(_score);
 		add(_hud);
 		add(_enemies);
-		
+		add(_players);
 		_timer = 0;
 		_spawnTime = 5;
+		_playerSpawnTimer = 0;
 		FlxG.cameras.flash(0xff131c1b);
-		
+		Reg.score = 0;
 		FlxG.watch.add(_enemies, "length", "numEnemies");
 		super.create();
 	}
@@ -56,6 +65,7 @@ class PlayState extends FlxState
 		super.destroy();
 		
 		_enemies = null;
+		_players = null;
 		_hud = null;
 
 	}
@@ -66,14 +76,19 @@ class PlayState extends FlxState
 	override public function update():Void
 	{
 		super.update();
-		
+		FlxG.overlap(_enemies, _players, endGame);
 		_timer += FlxG.elapsed;
-		
+		_playerSpawnTimer += FlxG.elapsed;
 		if (_timer >= _spawnTime)
 		{
 			spawnEnemy();
 			if (_spawnTime > 1.0)_spawnTime-= 0.2;
 			_timer = 0;
+		}
+		if (_playerSpawnTimer >= 20)
+		{
+			addPlayer();
+			_playerSpawnTimer -= 20;
 		}
 	}
 	
@@ -91,5 +106,21 @@ class PlayState extends FlxState
 			case 3:
 				_enemies.recycle(Enemy).init(-20,Math.floor(FlxG.height * Math.random()),rnd);
 		}
+		Reg.score++;
+		_score.text = Std.string(Reg.score);
+	}
+	
+	private function addPlayer():Void
+	{
+		var rnd:Int = Math.round((Math.random() * 25) +65);
+		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, String.fromCharCode(rnd)));
+	}
+	
+	/**
+	 * Runs when the game is over
+	 */
+	private function endGame(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	{
+		FlxG.switchState(new MenuState());
 	}
 }

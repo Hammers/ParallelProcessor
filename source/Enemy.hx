@@ -30,7 +30,7 @@ class Enemy extends FlxSprite
 		animation.add("right", [3]);
 		animation.add("poof", [4, 5, 6, 7], 50, false);
 		
-		_speed = 360;
+		_speed = 60;
 		
 		// Here we are setting up the jet particles
 		// that shoot out the back of the ship.
@@ -41,9 +41,7 @@ class Enemy extends FlxSprite
 	}
 	
 	/**
-	 * Each time an Enemy is recycled (in this game, by the Spawner object)
-	 * we call init() on it afterward.  That allows us to set critical parameters
-	 * like references to the player object and the ship's new position.
+	 * Each time an Enemy is recycled we call init to reset it's variables
 	 */
 	public function init(xPos:Int, yPos:Int, Aim:Int):Void
 	{
