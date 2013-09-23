@@ -9,6 +9,7 @@ import flixel.text.FlxText;
 import flixel.ui.FlxButton;
 import flixel.util.FlxMisc;
 import flixel.util.FlxMath;
+import flixel.util.FlxSave;
 
 /**
  * A FlxState which can be used for the game's menu.
@@ -16,6 +17,7 @@ import flixel.util.FlxMath;
 class MenuState extends FlxState
 {
 	private var _fading:Bool;
+	private var _save:FlxSave;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -43,15 +45,23 @@ class MenuState extends FlxState
 		flixelButton.label.color = 0xffd8eba2;
 		text.alignment = "center";
 		add(flixelButton);
-		
-		if (Reg.highScore > 0)
+		_save = new FlxSave();
+		_save.bind("Save");
+		if (_save.data.highScore == null)
+		{
+			_save.data.highScore = 0;
+			_save.data.lastScore = 0;
+			
+		}
+		else if (_save.data.highScore > 0)
 		{
 			var scoretext:FlxText;
-		scoretext = new FlxText(FlxG.width / 2 - 100, FlxG.height / 4 + 130, 200, "HIGHEST: " + Reg.highScore + "  LAST: " + Reg.lastScore, 12);
-		scoretext.color = 0x729954;
-		scoretext.alignment = "center";
-		add(scoretext);
+			scoretext = new FlxText(FlxG.width / 2 - 100, FlxG.height / 4 + 130, 200, "HIGHEST: " + _save.data.highScore + "  LAST: " + _save.data.lastScore, 12);
+			scoretext.color = 0x729954;
+			scoretext.alignment = "center";
+			add(scoretext);
 		}
+		_save.close();
 	}
 	
 	/**

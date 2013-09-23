@@ -12,6 +12,7 @@ import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
 import flixel.ui.FlxButton;
 import flixel.util.FlxPoint;
+import flixel.util.FlxSave;
 
 /**
  * A FlxState which can be used for the actual gameplay.
@@ -26,6 +27,7 @@ class PlayState extends FlxState
 	private var _hud:FlxGroup;
 	private var _players:FlxTypedGroup<Player>;
 	private var _score:FlxText;
+	private var _save:FlxSave;
 	/**
 	 * Function that is called up when to state is created to set it up. 
 	 */
@@ -135,8 +137,11 @@ class PlayState extends FlxState
 	private function endGame(Sprite1:FlxObject, Sprite2:FlxObject):Void
 	{
 		_gameOver = true;
-		Reg.lastScore = Reg.score;
-		if (Reg.score > Reg.highScore) Reg.highScore = Reg.score;
+		_save = new FlxSave();
+		_save.bind("Save");
+		_save.data.lastScore = Reg.score;
+		if (Reg.score > _save.data.highScore) _save.data.highScore = Reg.score;
+		_save.close();
 	}
 
 	/**
