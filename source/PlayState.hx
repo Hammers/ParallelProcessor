@@ -21,6 +21,7 @@ class PlayState extends FlxState
 	private var _timer:Float;
 	private var _spawnTime:Float;
 	private var _playerSpawnTimer:Float;
+	private var _gameOver:Bool;
 	private var _enemies:FlxTypedGroup<Enemy>;
 	private var _hud:FlxGroup;
 	private var _players:FlxTypedGroup<Player>;
@@ -50,6 +51,7 @@ class PlayState extends FlxState
 		_timer = 0;
 		_spawnTime = 5;
 		_playerSpawnTimer = 0;
+		_gameOver = false;
 		FlxG.cameras.flash(0xff131c1b);
 		Reg.score = 0;
 		FlxG.watch.add(_enemies, "length", "numEnemies");
@@ -76,19 +78,33 @@ class PlayState extends FlxState
 	override public function update():Void
 	{
 		super.update();
-		FlxG.overlap(_enemies, _players, endGame);
-		_timer += FlxG.elapsed;
-		_playerSpawnTimer += FlxG.elapsed;
-		if (_timer >= _spawnTime)
+		if(!_gameOver)
 		{
-			spawnEnemy();
-			if (_spawnTime > 1.0)_spawnTime-= 0.2;
-			_timer = 0;
+			FlxG.overlap(_enemies, _players, endGame);
+			_timer += FlxG.elapsed;
+			_playerSpawnTimer += FlxG.elapsed;
+			if (_timer >= _spawnTime)
+			{
+				spawnEnemy();
+				if (_spawnTime > 1.0)_spawnTime-= 0.2;
+				_timer = 0;
+			}
+			if (_playerSpawnTimer >= 20)
+			{
+				addPlayer();
+				_playerSpawnTimer -= 20;
+			}
 		}
-		if (_playerSpawnTimer >= 20)
+		else
 		{
-			addPlayer();
-			_playerSpawnTimer -= 20;
+			if(FlxG.keys.justPressed.SPACE)
+			{
+				restartGame();
+			}
+			if(FlxG.keys.justPressed.ESCAPE)
+			{
+				quitGame();
+			}
 		}
 	}
 	
@@ -116,10 +132,25 @@ class PlayState extends FlxState
 		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, String.fromCharCode(rnd)));
 	}
 	
+	private function endGame(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	{
+		_gameOver = true;
+		Reg.lastScore = Reg.score;
+		if (Reg.score > Reg.highScore) Reg.highScore = Reg.score;
+	}
+
 	/**
 	 * Runs when the game is over
 	 */
-	private function endGame(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	private function restartGame():Void
+	{
+		FlxG.switchState(new PlayState());
+	}
+
+	/**
+	 * Runs when the game is over
+	 */
+	private function quitGame():Void
 	{
 		FlxG.switchState(new MenuState());
 	}

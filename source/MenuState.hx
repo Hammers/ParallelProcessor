@@ -43,6 +43,15 @@ class MenuState extends FlxState
 		flixelButton.label.color = 0xffd8eba2;
 		text.alignment = "center";
 		add(flixelButton);
+		
+		if (Reg.highScore > 0)
+		{
+			var scoretext:FlxText;
+		scoretext = new FlxText(FlxG.width / 2 - 100, FlxG.height / 4 + 130, 200, "HIGHEST: " + Reg.highScore + "  LAST: " + Reg.lastScore, 12);
+		scoretext.color = 0x729954;
+		scoretext.alignment = "center";
+		add(scoretext);
+		}
 	}
 	
 	/**
