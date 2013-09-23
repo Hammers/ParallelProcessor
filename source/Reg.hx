@@ -10,16 +10,6 @@ import flixel.util.FlxSave;
 class Reg
 {
 	/**
-	 * Generic levels Array that can be used for cross-state stuff.
-	 * Example usage: Storing the levels of a platformer.
-	 */
-	static public var levels:Array<Dynamic> = [];
-	/**
-	 * Generic level variable that can be used for cross-state stuff.
-	 * Example usage: Storing the current level number.
-	 */
-	static public var level:Int = 0;
-	/**
 	 * Generic scores Array that can be used for cross-state stuff.
 	 * Example usage: Storing the scores for level.
 	 */
@@ -29,6 +19,8 @@ class Reg
 	 * Example usage: Storing the current score.
 	 */
 	static public var score:Int = 0;
+	static public var lastScore:Int = 0;
+	static public var highScore:Int = 0;
 	/**
 	 * Generic bucket for storing different <code>FlxSaves</code>.
 	 * Especially useful for setting up multiple save slots.
