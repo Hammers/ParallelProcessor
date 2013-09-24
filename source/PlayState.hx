@@ -134,14 +134,19 @@ class PlayState extends FlxState
 		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, String.fromCharCode(rnd)));
 	}
 	
-	private function endGame(Sprite1:FlxObject, Sprite2:FlxObject):Void
+	private function endGame(enemy:FlxObject, player:FlxObject):Void
 	{
 		_gameOver = true;
+		_players.setAll("active",false);
+		player.kill();
 		_save = new FlxSave();
 		_save.bind("Save");
 		_save.data.lastScore = Reg.score;
 		if (Reg.score > _save.data.highScore) _save.data.highScore = Reg.score;
 		_save.close();
+		var text = new FlxText(FlxG.width/2, FlxG.height/2-16, 400, "Press SPACE to restart or ESC to quit");
+		text.setFormat(null, 16, 0xd8eba2, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
+		add(text);
 	}
 
 	/**

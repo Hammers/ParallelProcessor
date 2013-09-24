@@ -114,7 +114,6 @@ class Player extends FlxSprite
 		
 		_jets.on = false;
 		alive = false;
-		solid = false;
 	}
 	
 	/**
