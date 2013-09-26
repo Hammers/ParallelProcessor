@@ -30,12 +30,12 @@ class MenuState extends FlxState
 		FlxG.mouse.show();
 		#end
 		var text:FlxText;
-		text = new FlxText(FlxG.width / 2 - 200, FlxG.height / 3 + 39, 400, "PARALLELPROCESSOR", 16);
+		text = new FlxText(FlxG.width / 2 - 200, FlxG.height / 2 - 16, 400, "PARALLELPROCESSOR", 16);
 		text.alignment = "center";
 		text.color = 0x3a5c39;
 		add(text);
 		
-		text = new FlxText(FlxG.width / 2 - 100, FlxG.height / 4 + 100, 200, "Press Z", 12);
+		text = new FlxText(FlxG.width / 2 - 100, FlxG.height / 2 + 16 , 200, "Press Z", 12);
 		text.color = 0x729954;
 		text.alignment = "center";
 		add(text);
@@ -79,12 +79,15 @@ class MenuState extends FlxState
 	override public function update():Void
 	{
 		super.update();
-		if (!_fading && FlxG.keyboard.justPressed("Z")) 
+		if (!_fading)
 		{
-			_fading = true;
-			//FlxG.sound.play("MenuHit2");
-			FlxG.cameras.flash(0xffd8eba2, 0.5);
-			FlxG.cameras.fade(0xff131c1b, 1, false, onFade);
+			if(FlxG.keyboard.justPressed("Z")) 
+			{
+				_fading = true;
+				//FlxG.sound.play("MenuHit2");
+				FlxG.cameras.flash(0xffd8eba2, 0.5);
+				FlxG.cameras.fade(0xff131c1b, 1, false, onFade);
+			}
 		}
 	}
 	

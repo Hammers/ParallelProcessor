@@ -24,7 +24,6 @@ class PlayState extends FlxState
 	private var _playerSpawnTimer:Float;
 	private var _gameOver:Bool;
 	private var _enemies:FlxTypedGroup<Enemy>;
-	private var _hud:FlxGroup;
 	private var _players:FlxTypedGroup<Player>;
 	private var _score:FlxText;
 	private var _save:FlxSave;
@@ -40,14 +39,12 @@ class PlayState extends FlxState
 		#else
 		_enemies.maxSize = 25;
 		#end
-		_hud = new FlxGroup();
 		_players = new FlxTypedGroup<Player>();
 		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, "Z"));
 		
 		_score = new FlxText(0, FlxG.height/2, Math.floor(FlxG.width),"0");
 		_score.setFormat(null, 48, 0x383D2A, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
-		_hud.add(_score);
-		add(_hud);
+		add(_score);
 		add(_enemies);
 		add(_players);
 		_timer = 0;
@@ -70,7 +67,7 @@ class PlayState extends FlxState
 		
 		_enemies = null;
 		_players = null;
-		_hud = null;
+		_score = null;
 
 	}
 
@@ -144,7 +141,13 @@ class PlayState extends FlxState
 		_save.data.lastScore = Reg.score;
 		if (Reg.score > _save.data.highScore) _save.data.highScore = Reg.score;
 		_save.close();
-		var text = new FlxText(FlxG.width/2, FlxG.height/2-16, 400, "Press SPACE to restart or ESC to quit");
+		var text = new FlxText(0, FlxG.height / 3 - 20, FlxG.width, "GAME OVER");
+		text.setFormat(null, 16, 0xd8eba2, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
+		add(text);
+		text = new FlxText(0, FlxG.height/3, FlxG.width, "SPACE - Restart");
+		text.setFormat(null, 16, 0xd8eba2, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
+		add(text);
+		text = new FlxText(0, FlxG.height/2-16, FlxG.width, "ESC - quit");
 		text.setFormat(null, 16, 0xd8eba2, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
 		add(text);
 	}
