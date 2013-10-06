@@ -1,6 +1,5 @@
 package ;
 
-import flixel.effects.particles.FlxEmitter;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -13,30 +12,23 @@ class Enemy extends FlxSprite
 {
 
 	private var _speed:Float;
-	private var _jets:FlxEmitter;
 	private var _enteredScreen:Bool;
+	
 	public function new() 
 	{
 		super();
 		
-		loadGraphic("assets/images/bullet.png", true);
+		loadGraphic("assets/images/enemy.png", true);
 		width = 6;
 		height = 6;
 		offset.set(1, 1);
 		
-		animation.add("up", [0]);
-		animation.add("down", [1]);
-		animation.add("left", [2]);
-		animation.add("right", [3]);
-		animation.add("poof", [4, 5, 6, 7], 50, false);
+		animation.add("down", [0,1,2,3],25,true);
+		animation.add("up", [4,5,6,7],25,true);
+		animation.add("right", [8,9,10,11],25,true);
+		animation.add("left", [12,13,14,15],25,true);
 		
 		_speed = 60;
-		
-		// Here we are setting up the jet particles
-		// that shoot out the back of the ship.
-		_jets = new FlxEmitter();
-		_jets.setRotation();
-		_jets.makeParticles("assets/images/jet.png", 15, 0, false, 0);
 		
 	}
 	
@@ -65,7 +57,6 @@ class Enemy extends FlxSprite
 				animation.play("right");
 				velocity.x = _speed;
 		}
-		_jets.start(false, 0.5, 0.01);
 	}
 	
 	override public function update():Void
@@ -78,11 +69,7 @@ class Enemy extends FlxSprite
 			}
 		}
 		else
-		{	_jets.at(this);
-			_jets.setXSpeed(-velocity.x-30,-velocity.x+30);
-			_jets.setYSpeed( -velocity.y - 30, -velocity.y + 30);
-			_jets.update();
-			if (!onScreen())
+		{	if (!onScreen())
 			{
 				if(_enteredScreen)kill();
 			}
@@ -103,7 +90,6 @@ class Enemy extends FlxSprite
 		
 		velocity.set(0, 0);
 		
-		_jets.on = false;
 		alive = false;
 		solid = false;
 		_enteredScreen = false;
@@ -115,8 +101,5 @@ class Enemy extends FlxSprite
 	override public function destroy():Void
 	{
 		super.destroy();
-		
-		_jets.destroy();
-		_jets = null;
 	}
 }

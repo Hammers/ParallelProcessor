@@ -9,13 +9,10 @@ import flixel.FlxState;
 import flixel.group.FlxGroup;
 import flixel.group.FlxTypedGroup;
 import flixel.text.FlxText;
-import flixel.tile.FlxTilemap;
-import flixel.ui.FlxButton;
-import flixel.util.FlxPoint;
 import flixel.util.FlxSave;
 
 /**
- * A FlxState which can be used for the actual gameplay.
+ * The FlxState used for the actual gameplay.
  */
 class PlayState extends FlxState
 {
@@ -23,43 +20,57 @@ class PlayState extends FlxState
 	private var _spawnTime:Float;
 	private var _playerSpawnTimer:Float;
 	private var _gameOver:Bool;
+	private var _gibs:FlxEmitter;
 	private var _enemies:FlxTypedGroup<Enemy>;
 	private var _players:FlxTypedGroup<Player>;
 	private var _score:FlxText;
 	private var _save:FlxSave;
+	
 	/**
-	 * Function that is called up when to state is created to set it up. 
+	 * Function that is called up when state is created to set it up. 
 	 */
 	override public function create():Void
 	{
-		// Set a background color
+		//Create the enemies. These are recycled as they fly off screen.
 		_enemies = new FlxTypedGroup<Enemy>();
-		#if flash
 		_enemies.maxSize = 50;
-		#else
-		_enemies.maxSize = 25;
-		#end
-		_players = new FlxTypedGroup<Player>();
-		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, "Z"));
 		
+		//Create the players. These aren't recycled but it's still easier to group them.
+		_players = new FlxTypedGroup<Player>();
+		//Spawn the first player before the game starts
+		_players.add(new Player(FlxG.width / 2 - 8, FlxG.height / 2 - 8, "Z"));
+		
+		//Create the emitter used when the player loses.
+		_gibs = new FlxEmitter();
+		_gibs.setXSpeed( -150, 150);
+		_gibs.setYSpeed( -150, 150);
+		_gibs.setAlpha(0.7, 1, 0, 0);
+		_gibs.setRotation( -100, 100);
+		_gibs.makeParticles("assets/images/gibs.png", 100, 0, false, 0);
+		
+		//Create the score text which is displayed in the background
 		_score = new FlxText(0, FlxG.height/2, Math.floor(FlxG.width),"0");
 		_score.setFormat(null, 48, 0x383D2A, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
+		
+		//Add all these elements to the state so they're drawn and updated automatically.
 		add(_score);
 		add(_enemies);
+		add(_gibs);
 		add(_players);
+		
+		//Set up the game timers and logic
 		_timer = 0;
 		_spawnTime = 5;
 		_playerSpawnTimer = 0;
 		_gameOver = false;
-		FlxG.cameras.flash(0xff131c1b);
 		Reg.score = 0;
-		FlxG.watch.add(_enemies, "length", "numEnemies");
+
+		FlxG.cameras.flash(0xff131c1b);
 		super.create();
 	}
 	
 	/**
-	 * Function that is called when this state is destroyed - you might want to 
-	 * consider setting all objects this state uses to null to help garbage collection.
+	 * Function that is called when this state is destroyed
 	 */
 	override public function destroy():Void
 	{
@@ -68,6 +79,7 @@ class PlayState extends FlxState
 		_enemies = null;
 		_players = null;
 		_score = null;
+		_gibs = null;
 
 	}
 
@@ -107,6 +119,9 @@ class PlayState extends FlxState
 		}
 	}
 	
+	/**
+	 * Creates a new enemy outside the play area on a random edge
+	 */
 	private function spawnEnemy():Void
 	{
 		var rnd = Math.floor(Math.random() * 4);
@@ -125,16 +140,24 @@ class PlayState extends FlxState
 		_score.text = Std.string(Reg.score);
 	}
 	
+	/**
+	 * Adds a new player ship to the center of the game screen.
+	 */
 	private function addPlayer():Void
 	{
 		var rnd:Int = Math.round((Math.random() * 25) +65);
-		_players.add(new Player(FlxG.width / 2, FlxG.height / 2, String.fromCharCode(rnd)));
+		_players.add(new Player(FlxG.width / 2 - 8, FlxG.height / 2 - 8, String.fromCharCode(rnd)));
 	}
 	
+	/**
+	 * Called when a player ship collides with an enemy and ends the game
+	 */
 	private function endGame(enemy:FlxObject, player:FlxObject):Void
 	{
 		_gameOver = true;
-		_players.setAll("active",false);
+		_players.setAll("active", false);
+		_gibs.at(player);
+		_gibs.start(true,5);
 		player.kill();
 		_save = new FlxSave();
 		_save.bind("Save");
@@ -153,7 +176,7 @@ class PlayState extends FlxState
 	}
 
 	/**
-	 * Runs when the game is over
+	 * Restarts this state
 	 */
 	private function restartGame():Void
 	{
@@ -161,7 +184,7 @@ class PlayState extends FlxState
 	}
 
 	/**
-	 * Runs when the game is over
+	 * Returns the player to the menu state
 	 */
 	private function quitGame():Void
 	{

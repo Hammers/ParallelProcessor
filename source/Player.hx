@@ -1,6 +1,5 @@
 package ;
 
-import flixel.effects.particles.FlxEmitter;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
@@ -17,7 +16,6 @@ class Player extends FlxSprite
 {
 
 	private var _speed:Float;
-	private var _jets:FlxEmitter;
 	private var _key:String;
 	private var _rotation:Int;
 	private var _text:FlxText;
@@ -27,28 +25,27 @@ class Player extends FlxSprite
 	public function new(xPos:Float, yPos:Float, Key:String) 
 	{
 		super();
-
-		loadGraphic("assets/images/bot.png", true);
+		loadGraphic("assets/images/player.png", true);
+		
 		width = 12;
 		height = 12;
 		offset.set(2, 2);
-		
 		setPosition(xPos, yPos);
 		_speed = 120;
 		_key = Key;
+		
 		_text = new FlxText(xPos, yPos, 16, _key);
 		_text.setFormat(null, 8, 0xd8eba2, "left", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
-		// Here we are setting up the jet particles
-		// that shoot out the back of the ship.
-		_jets = new FlxEmitter();
-		_jets.setRotation();
-		_jets.makeParticles("assets/images/jet.png", 15, 0, false, 0);
+
 		animation.add("up", [0]);
 		animation.add("right", [1]);
 		animation.add("down", [2]);
 		animation.add("left", [3]);
+		
 		_rotation = Math.round(Math.random() * 3);
 		rotate();
+		
+		//We don't bother flickering if this is the initial ship (which is always Z)
 		if (_key != "Z")
 		{
 			flickering = true;
@@ -82,14 +79,6 @@ class Player extends FlxSprite
 				case 3:
 					velocity.x = -_speed;
 			}
-			_jets.at(this);
-			_jets.setXSpeed(-velocity.x-30,-velocity.x+30);
-			_jets.setYSpeed( -velocity.y - 30, -velocity.y + 30);
-			_jets.update();
-		}
-		else
-		{
-			_jets.on = false;
 		}
 		_text.x = this.x+2;
 		_text.y = this.y+1;
@@ -99,8 +88,11 @@ class Player extends FlxSprite
 	
 	override public function draw():Void
 	{
-		super.draw();
-		_text.draw();
+		if (alive)
+		{
+			super.draw();
+			_text.draw();
+		}
 	}
 	
 	override public function kill():Void
@@ -111,8 +103,6 @@ class Player extends FlxSprite
 		}
 		
 		velocity.set(0, 0);
-		
-		_jets.on = false;
 		alive = false;
 	}
 	
@@ -122,9 +112,6 @@ class Player extends FlxSprite
 	override public function destroy():Void
 	{
 		super.destroy();
-		
-		_jets.destroy();
-		_jets = null;
 	}
 	
 	public function rotate():Void

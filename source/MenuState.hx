@@ -1,34 +1,31 @@
 package;
 
 import flixel.FlxG;
-import flixel.FlxSprite;
 import flixel.FlxState;
-import flixel.system.input.keyboard.FlxKeyboard;
-import flixel.system.input.keyboard.FlxKeyShortcuts;
 import flixel.text.FlxText;
-import flixel.ui.FlxButton;
-import flixel.util.FlxMisc;
-import flixel.util.FlxMath;
 import flixel.util.FlxSave;
 
 /**
- * A FlxState which can be used for the game's menu.
+ * The FlxState used for the game's menu.
  */
 class MenuState extends FlxState
 {
 	private var _fading:Bool;
 	private var _save:FlxSave;
+	
 	/**
-	 * Function that is called up when to state is created to set it up. 
+	 * Function that is called up when state is created to set it up. 
 	 */
 	override public function create():Void
 	{
 		// Set a background color
 		FlxG.cameras.bgColor = 0xff131c1b;
-		// Show the mouse (in case it hasn't been disabled)
+		
+		// Hide the mouse
 		#if !FLX_NO_MOUSE
-		FlxG.mouse.show();
+		FlxG.mouse.hide();
 		#end
+		//Set up the text on screen
 		var text:FlxText;
 		text = new FlxText(FlxG.width / 2 - 200, FlxG.height / 2 - 16, 400, "PARALLELPROCESSOR", 16);
 		text.alignment = "center";
@@ -40,19 +37,23 @@ class MenuState extends FlxState
 		text.alignment = "center";
 		add(text);
 		
-		var flixelButton:FlxButton = new FlxButton(FlxG.width - 80, FlxG.height - 20, "Ryan Hamlet", onAuthor);
-		flixelButton.color = 0xff729954;
-		flixelButton.label.color = 0xffd8eba2;
-		text.alignment = "center";
-		add(flixelButton);
+		text = new FlxText(2, FlxG.height - 12 , 30, "v0.1", 8);
+		text.color = 0x729954;
+		text.alignment = "left";
+		add(text);
+		
+		//Load the save game
 		_save = new FlxSave();
 		_save.bind("Save");
+		
+		//If this is the first time the game's loaded, prep the save game
 		if (_save.data.highScore == null)
 		{
 			_save.data.highScore = 0;
 			_save.data.lastScore = 0;
 			
 		}
+		//Otherwise load the score data
 		else if (_save.data.highScore > 0)
 		{
 			var scoretext:FlxText;
@@ -65,8 +66,7 @@ class MenuState extends FlxState
 	}
 	
 	/**
-	 * Function that is called when this state is destroyed - you might want to 
-	 * consider setting all objects this state uses to null to help garbage collection.
+	 * Function that is called when this state is destroyed
 	 */
 	override public function destroy():Void
 	{
@@ -84,22 +84,14 @@ class MenuState extends FlxState
 			if(FlxG.keyboard.justPressed("Z")) 
 			{
 				_fading = true;
-				//FlxG.sound.play("MenuHit2");
 				FlxG.cameras.flash(0xffd8eba2, 0.5);
 				FlxG.cameras.fade(0xff131c1b, 1, false, onFade);
 			}
 		}
 	}
 	
-	private function onAuthor():Void
-	{
-		FlxMisc.openURL("http://www.rhamlet.com");
-	}
-	
 	/**
-	 * This function is passed to FlxG.fade() when we are ready to go to the next game state.
-	 * When FlxG.fade() finishes, it will call this, which in turn will either load
-	 * up a game demo/replay, or let the player start playing, depending on user input.
+	 * Loads the play state. Called by the fade function once the fade has finished
 	 */
 	private function onFade():Void
 	{
