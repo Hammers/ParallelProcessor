@@ -51,7 +51,7 @@ class MenuState extends FlxState
 		{
 			_save.data.highScore = 0;
 			_save.data.lastScore = 0;
-			
+			_save.data.tutorial = true;
 		}
 		//Otherwise load the score data
 		else if (_save.data.highScore > 0)
@@ -60,6 +60,7 @@ class MenuState extends FlxState
 			scoretext = new FlxText(FlxG.width / 2 - 100, FlxG.height / 4 + 130, 200, "HIGHEST: " + _save.data.highScore + "  LAST: " + _save.data.lastScore, 12);
 			scoretext.color = 0x729954;
 			scoretext.alignment = "center";
+			_save.data.tutorial = true;
 			add(scoretext);
 		}
 		_save.close();

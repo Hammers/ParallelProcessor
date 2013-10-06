@@ -25,6 +25,13 @@ class PlayState extends FlxState
 	private var _players:FlxTypedGroup<Player>;
 	private var _score:FlxText;
 	private var _save:FlxSave;
+	private var _thrustText:TutorialText;
+	private var _rotateText:TutorialText;
+	private var _keyText:TutorialText;
+	private var _tutKey:String;
+	private var _tutorialTwo:Bool;
+	private var _tutorialThree:Bool;
+	private var _tutorialFour:Bool;
 	
 	/**
 	 * Function that is called up when state is created to set it up. 
@@ -52,11 +59,30 @@ class PlayState extends FlxState
 		_score = new FlxText(0, FlxG.height/2, Math.floor(FlxG.width),"0");
 		_score.setFormat(null, 48, 0x383D2A, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
 		
+		//Load the save game
+		_save = new FlxSave();
+		_save.bind("Save");
+		if (_save.data.tutorial)
+		{
+			_thrustText = new TutorialText(FlxG.width / 2 - 50, FlxG.height / 2 - 8, 42, "Press");
+			_tutorialTwo = true;
+			_tutorialThree = false;
+			_tutorialFour = true;
+		}
+		else
+		{
+			_tutorialTwo = false;
+			_tutorialThree = false;
+			_tutorialFour = false;
+		}
+		_save.close();
+		
 		//Add all these elements to the state so they're drawn and updated automatically.
 		add(_score);
 		add(_enemies);
 		add(_gibs);
 		add(_players);
+		add(_thrustText);
 		
 		//Set up the game timers and logic
 		_timer = 0;
@@ -105,6 +131,23 @@ class PlayState extends FlxState
 				addPlayer();
 				_playerSpawnTimer -= 20;
 			}
+			if(_tutorialTwo && FlxG.keys.justPressed.Z)
+			{
+				_thrustText.fadeOut();
+				_tutorialTwo = false;
+				_tutorialThree = true;
+				_rotateText = new TutorialText(FlxG.width / 2 - 57, FlxG.height - 50, 114, "Press SPACE to rotate", false);
+				_rotateText.fadeIn();
+				add(_rotateText);
+			}
+			if(_tutorialThree && FlxG.keys.justPressed.SPACE)
+			{
+				_rotateText.fadeOut();
+			}
+			if(_tutKey!=null && FlxG.keyboard.pressed(_tutKey))
+			{
+				_keyText.fadeOut();
+			}
 		}
 		else
 		{
@@ -147,6 +190,13 @@ class PlayState extends FlxState
 	{
 		var rnd:Int = Math.round((Math.random() * 25) +65);
 		_players.add(new Player(FlxG.width / 2 - 8, FlxG.height / 2 - 8, String.fromCharCode(rnd)));
+		if (_tutorialFour)
+		{
+			_keyText = new TutorialText(FlxG.width / 2 - 50, FlxG.height / 2 - 8, 42, "Press");
+			add(_keyText);
+			_tutKey = String.fromCharCode(rnd);
+			_tutorialFour = false;
+		}
 	}
 	
 	/**
@@ -159,11 +209,14 @@ class PlayState extends FlxState
 		_gibs.at(player);
 		_gibs.start(true,5);
 		player.kill();
+		
 		_save = new FlxSave();
 		_save.bind("Save");
 		_save.data.lastScore = Reg.score;
+		if(!_tutorialFour) _save.data.tutorial = false;
 		if (Reg.score > _save.data.highScore) _save.data.highScore = Reg.score;
 		_save.close();
+		
 		var text = new FlxText(0, FlxG.height / 3 - 20, FlxG.width, "GAME OVER");
 		text.setFormat(null, 16, 0xd8eba2, "center", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
 		add(text);

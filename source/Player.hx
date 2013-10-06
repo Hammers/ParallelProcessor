@@ -36,7 +36,7 @@ class Player extends FlxSprite
 		
 		_text = new FlxText(xPos, yPos, 16, _key);
 		_text.setFormat(null, 8, 0xd8eba2, "left", FlxText.BORDER_OUTLINE_FAST, 0x131c1b);
-
+		
 		animation.add("up", [0]);
 		animation.add("right", [1]);
 		animation.add("down", [2]);
